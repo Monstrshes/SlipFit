@@ -1,0 +1,13 @@
+# Виртуальные окружения
+venv/
+env/
+.venv/
+
+# Байтовые файлы Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+database/base.db
