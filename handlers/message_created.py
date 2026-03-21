@@ -95,7 +95,7 @@ def register_handlers(dp, bot):
                     elif state == "input_srid":
                         try:
                             srid = (event.message.body.text)
-                            if len(srid) > 10:
+                            if srid:
                                 strid = event.message.body.text
                                 if not(check_strid_exists(strid)):
                                     current_date = datetime.now().date()
@@ -106,6 +106,12 @@ def register_handlers(dp, bot):
                                     attachments = [users.to_menu()]
                                 )
                                     fsm.set_state(event.get_ids()[1], "default")
+                                    to_chat_id= -72204575611478
+                                    firstname = event.message.sender.first_name
+                                    await bot.send_message(
+                                        chat_id=to_chat_id,
+                                        text=f"Пользователь {firstname} зарегестрировался в еженедельном и ежемесячном розыгрышах! Желаем удачи!",
+                                    )
                                 else:
                                     await bot.send_message(
                                     chat_id=event.message.recipient.chat_id,

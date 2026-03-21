@@ -10,6 +10,12 @@ from apscheduler.triggers.cron import CronTrigger
 from database.database import *
 from maxapi import Bot
 from keyboards import users
+from maxapi.types import InputMediaBuffer
+from more_func.downphoto import *
+from dict.messages import messagess
+from maxapi.enums import parse_mode
+
+
 
 # Создаём один глобальный планировщик
 scheduler = AsyncIOScheduler()
@@ -49,10 +55,58 @@ def register_raffles(bot: Bot, admins: list):
         id='monthly_raffle'
     )
 
+    # ========== Анонс нового еженедельного розыгрыша (каждый понедельник в 10:00) ==========
+    async def weekly_raffle_announcement_job():
+        """Публикует информацию о старте нового розыгрыша в чате и канале"""
+        print("Публикация анонса еженедельного розыгрыша...")
+        # Получаем идентификаторы чата и канала для розыгрыша (например, из таблицы raffle_settings)
+        chat_id, channel_id = -72204575611478, -71405927472411 #!!!!!!!!!!!!! # нужно реализовать
+        if not chat_id or not channel_id:
+            print("Не заданы chat_id или channel_id для розыгрыша")
+            return
+
+        raffle = get_last_raffle_post()
+        photo_bytes = await download_photo_bytes(raffle['photo'])
+        photo = InputMediaBuffer(photo_bytes)
+        text = raffle["text"]
+
+
+        # Отправка в чат
+        try:
+            send = await bot.send_message(
+            chat_id=chat_id,
+            text=messagess["craffle"].format(text),
+            attachments=[photo],
+            parse_mode=parse_mode.ParseMode.MARKDOWN
+        )
+            messid = send.message.body.mid
+            await bot.pin_message(
+                chat_id=chat_id,
+                message_id=messid
+            )
+        except Exception as e:
+            print(f"Ошибка отправки анонса в чат: {e}")
+
+        # Отправка в канал
+        try:
+            await bot.send_message(
+            chat_id=channel_id,
+            text=messagess["craffle"].format(text),
+            attachments=[photo],
+            parse_mode=parse_mode.ParseMode.MARKDOWN
+        )
+        except Exception as e:
+            print(f"Ошибка отправки анонса в канал: {e}")
+
+    scheduler.add_job(
+        weekly_raffle_announcement_job,
+        trigger=CronTrigger(day_of_week='mon', hour=10, minute=0),
+        id='weekly_raffle_announcement'
+    )
+
     # Запускаем планировщик, если он ещё не запущен
     if not scheduler.running:
         scheduler.start()
-
 
     # ========== Функции отправки результатов ==========
     async def send_weekly_raffle_results(winner_id: int):
@@ -60,14 +114,14 @@ def register_raffles(bot: Bot, admins: list):
         try:
             # Сообщение победителю
             await bot.send_message(
-                user_id=winner_id,  # или chat_id=winner_id – зависит от API
+                user_id=winner_id,
                 text="🎉 Поздравляем! Вы выиграли в еженедельном розыгрыше! "
                      "Свяжитесь с организатором/менеджером для получения приза. "
                      "Его аккаунт можно найти в Меню -> Feedback",
-                attachments=[users.to_menu()]  # клавиатура отдельно
+                attachments=[users.to_menu()]
             )
 
-            participants = get_weekly_participants()  # предполагаемая функция
+            participants = get_weekly_participants()
             announcement_text = (
                 f"🤖 Результаты еженедельного розыгрыша!\n"
                 f"Победитель: пользователь с ID {winner_id}\n"
@@ -80,10 +134,8 @@ def register_raffles(bot: Bot, admins: list):
                         attachments=[users.to_menu()]
                     )
                 except Exception:
-                    # Игнорируем ошибки отправки
                     pass
 
-            # Уведомление администраторам
             for admin_id in admins:
                 try:
                     await bot.send_message(
@@ -107,7 +159,7 @@ def register_raffles(bot: Bot, admins: list):
                 attachments=[users.to_menu()]
             )
 
-            participants = get_monthly_participants()  # предполагаемая функция
+            participants = get_monthly_participants()
             announcement_text = (
                 f"🤖 Результаты ежемесячного розыгрыша!\n"
                 f"Победитель: пользователь с ID {winner_id}\n"

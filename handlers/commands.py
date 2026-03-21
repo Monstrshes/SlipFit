@@ -17,9 +17,6 @@ from loggs import setup_logging
 from config import Config
 from more_func.downphoto import download_photo_bytes, download_video_bytes
 from fsm.admin import UFSM, AFSM
-from maxapi.enums.http_method import HTTPMethod
-from maxapi.enums.api_path import ApiPath
-from maxapi.types.attachments.video import Video
 # Импортируем функции работы с БД
 from database.database import *
 
@@ -277,7 +274,7 @@ def register_handlers(dp, bot):
         if len(video['text']) > 5:
             text = f"{video['name']}\n\n{video['text']}"
         else:
-            text = f"{video["name"]}"
+            text = f"{video['name']}"
 
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
@@ -354,7 +351,7 @@ def register_handlers(dp, bot):
         if len(recipe['text']) > 5:
             text = f"{recipe['name']}\n\n{recipe['text']}"
         else:
-            text = f"{recipe["name"]}"
+            text = f"{recipe['name']}"
 
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
@@ -447,7 +444,6 @@ def register_handlers(dp, bot):
         await bot.delete_message(
             message_id=event.message.body.mid
         )
-
 
         await bot.send_message(
                     chat_id=event.message.recipient.chat_id,
