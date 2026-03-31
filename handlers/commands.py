@@ -243,43 +243,50 @@ def register_handlers(dp, bot):
 
     @dp.message_callback(F.callback.payload.startswith('vcatalog:'))
     async def show_videos_in_category(event: MessageCallback):
-        """Показывает видео в выбранной категории"""
         category = event.callback.payload.split(':')[1]
         item_id = int(event.callback.payload.split(':')[2])
 
         videos = get_videos_by_category(category)
         total_items = len(videos)
 
-
         if item_id > total_items:
             item_id = 1
         elif item_id < 1:
             item_id = total_items
 
-        await bot.delete_message(
-            message_id=event.message.body.mid
-        )
+        await bot.delete_message(message_id=event.message.body.mid)
 
         video = get_video_in_category(category, item_id)
         if not video:
             return
-        token = video["token"]
-        if token:
-            video1= AttachmentUpload(
-                type=UploadType.VIDEO,
-                payload=AttachmentPayload(token=token)
-)
-        else:
-            video1 = InputMedia(video["video_url"])
-        if len(video['text']) > 5:
+
+        user_id = event.get_ids()[1]
+        is_admin = user_id in admins()   # функция из database.users
+
+        # Формируем текст
+        if len(video.get('text', '')) > 5:
             text = f"{video['name']}\n\n{video['text']}"
         else:
-            text = f"{video['name']}"
+            text = video['name']
+
+        # Медиа-вложение
+        token = video.get("token")
+        if token:
+            video_att = AttachmentUpload(
+                type=UploadType.VIDEO,
+                payload=AttachmentPayload(token=token)
+            )
+        else:
+            video_att = InputMedia(video["video_url"])
+
+
+
+        kb = users.viseo_catalog(category, total_items, item_id, is_admin, video["id"])
 
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
             text=text,
-            attachments=[video1, users.viseo_catalog(category, total_items,  item_id)],
+            attachments=[video_att, kb],
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
 
@@ -318,8 +325,8 @@ def register_handlers(dp, bot):
         category = event.callback.payload.split(':')[1]
         item_id = int(event.callback.payload.split(':')[2])
 
-        videos = get_recipes_by_category(category)
-        total_items = len(videos)
+        recipes = get_recipes_by_category(category)
+        total_items = len(recipes)
 
         if total_items == 0:
             await bot.send_message(
@@ -335,28 +342,47 @@ def register_handlers(dp, bot):
         elif item_id < 1:
             item_id = total_items
 
-        await bot.delete_message(
-            message_id=event.message.body.mid
-        )
+        await bot.delete_message(message_id=event.message.body.mid)
 
         recipe = get_recipe_in_category(category, item_id)
         if not recipe:
             return
-        token = recipe["video_url"]
-        if token:
-            video= AttachmentUpload(
-                type=UploadType.VIDEO,
-                payload=AttachmentPayload(token=token)
-)
-        if len(recipe['text']) > 5:
+
+        user_id = event.get_ids()[1]
+        is_admin = user_id in admins()
+
+        # Формируем текст
+        if len(recipe.get('text', '')) > 5:
             text = f"{recipe['name']}\n\n{recipe['text']}"
         else:
-            text = f"{recipe['name']}"
+            text = recipe['name']
+
+        # Медиа-вложение
+        token = recipe.get("video_url")   # предполагаем, что здесь токен, а не ссылка
+        if token and token.startswith("http"):   # если это ссылка, то используем InputMedia
+            video_att = InputMedia(token)
+        elif token:
+            video_att = AttachmentUpload(
+                type=UploadType.VIDEO,
+                payload=AttachmentPayload(token=token)
+            )
+        else:
+            video_att = None   # или что-то по умолчанию
+
+        # Клавиатура
+
+        kb = users.recipe_catalog(category, total_items, item_id, is_admin, recipe["id"])
+
+        # Отправляем сообщение
+        attachments = []
+        if video_att:
+            attachments.append(video_att)
+        attachments.append(kb)
 
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
             text=text,
-            attachments=[video, users.recipe_catalog(category, total_items,  item_id)],
+            attachments=attachments,
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
 

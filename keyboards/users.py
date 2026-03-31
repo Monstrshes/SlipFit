@@ -87,7 +87,7 @@ def video_cat():
 
     return builder.as_markup()
 
-def viseo_catalog(cat, len_catalog, item=1):
+def viseo_catalog(cat, len_catalog, item=1, isadmin=0, video_id=0):
     builder = InlineKeyboardBuilder()
 
     builder.row(
@@ -98,6 +98,11 @@ def viseo_catalog(cat, len_catalog, item=1):
     builder.row(
         CallbackButton(text='🔙 Назад', payload='video_cat')
         )
+    if isadmin:
+        builder.row(
+                CallbackButton(text="✏️ Название", payload=f"edit_video_name:{video_id}"),
+                CallbackButton(text="📝 Описание", payload=f"edit_video_desc:{video_id}")
+            )
 
     return builder.as_markup()
 
@@ -127,14 +132,18 @@ def wb_ozon():
         )
     return builder.as_markup()
 
-def recipe_catalog(cat, len_catalog, item=1):
+def recipe_catalog(cat, len_catalog, item=1, isadmin=0, recipe_id=0):
     builder = InlineKeyboardBuilder()
 
     builder.row(
         CallbackButton(text='◀️', payload=f'rcatalog:{cat}:{item-1}'),
         CallbackButton(text=f'{item}|{len_catalog}', payload = "hsjhdal"),
         CallbackButton(text='▶️', payload=f'rcatalog:{cat}:{item+1}'))
-
+    if isadmin:
+        builder.row(
+                CallbackButton(text="✏️ Название", payload=f"edit_recipe_name:{recipe_id}"),
+                CallbackButton(text="📝 Описание", payload=f"edit_recipe_desc:{recipe_id}")
+            )
     builder.row(
         CallbackButton(text='🔙 Назад', payload='recipe_cat')
         )

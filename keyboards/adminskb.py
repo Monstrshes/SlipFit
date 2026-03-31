@@ -21,7 +21,10 @@ def admin_menu():
     )
 
     return builder.as_markup()
-
+def back_to_video_menu_kb():
+    builder = InlineKeyboardBuilder()
+    builder.row(CallbackButton(text="🔙 Назад", payload="video_cat"))
+    return builder.as_markup()
 def acatalog():
     builder = InlineKeyboardBuilder()
 
@@ -229,4 +232,9 @@ def raffle_admin():
         CallbackButton(text='🔙 Назад', payload='Admin_Menu')
     )
 
+    return builder.as_markup()
+
+def back_to_recipe_menu_kb():
+    builder = InlineKeyboardBuilder()
+    builder.row(CallbackButton(text="🔙 Назад", payload="recipe_cat"))
     return builder.as_markup()

@@ -846,3 +846,51 @@ def get_all_users() -> list[int] | None:
     except Exception as e:
         print(f"Ошибка получения пользователей: {e}")
         return None
+
+def update_video_name(video_id: int, new_name: str) -> bool:
+    conn = sqlite3.connect('database/base.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE video SET name = ? WHERE id = ?", (new_name, video_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        return False
+    finally:
+        conn.close()
+
+def update_video_desc(video_id: int, new_desc: str | None) -> bool:
+    conn = sqlite3.connect('database/base.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE video SET text = ? WHERE id = ?", (new_desc, video_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        return False
+    finally:
+        conn.close()
+
+def update_recipe_name(recipe_id: int, new_name: str) -> bool:
+    conn = sqlite3.connect('database/base.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE recipes SET name = ? WHERE id = ?", (new_name, recipe_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        return False
+    finally:
+        conn.close()
+
+def update_recipe_desc(recipe_id: int, new_desc: str | None) -> bool:
+    conn = sqlite3.connect('database/base.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE recipes SET text = ? WHERE id = ?", (new_desc, recipe_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        return False
+    finally:
+        conn.close()

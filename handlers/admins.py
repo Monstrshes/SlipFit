@@ -453,343 +453,65 @@ def register_handlers(dp, bot):
             attachments = [adminskb.back4()],
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
+    @dp.message_callback(
+    F.callback.payload.startswith("edit_video_name:")
+)
+    async def edit_video_name_prompt(event: MessageCallback):
+        chat_id, user_id = event.get_ids()
+        if user_id not in admins():
+            return
+        video_id = event.callback.payload.split(":")[1]
+        fsm.append_dict(user_id, "video_id", video_id)
+        fsm.set_state(user_id, "set_video_name")
+        await bot.send_message(
+            chat_id=chat_id,
+            text="Введите новое название видео:",
+            attachments=[adminskb.back_to_video_menu_kb()]
+        )
 
+    @dp.message_callback(
+        F.callback.payload.startswith("edit_video_desc:")
+    )
+    async def edit_video_desc_prompt(event: MessageCallback):
+        chat_id, user_id = event.get_ids()
+        if user_id not in adminskb():
+            return
+        video_id = event.callback.payload.split(":")[1]
+        fsm.append_dict(user_id, "video_id", video_id)
+        fsm.set_state(user_id, "set_video_ds")
+        await bot.send_message(
+            chat_id=chat_id,
+            text="Введите новое описание видео (можно оставить пустым):",
+            attachments=[adminskb.back_to_video_menu_kb()]
+        )
+    @dp.message_callback(
+    F.callback.payload.startswith("edit_recipe_name:")
+)
+    async def edit_recipe_name_prompt(event: MessageCallback):
+        chat_id, user_id = event.get_ids()
+        if user_id not in admins():
+            return
+        recipe_id = event.callback.payload.split(":")[1]
+        fsm.append_dict(user_id, "recipe_id", recipe_id)
+        fsm.set_state(user_id, "set_recipe_name")
+        await bot.send_message(
+            chat_id=chat_id,
+            text="Введите новое название рецепта:",
+            attachments=[adminskb.back_to_recipe_menu_kb()]
+        )
 
-
-    # @dp.message_created()
-    # async def message_from_admin(event: MessageCreated):
-    #     if event.get_ids()[1] in admins and fsm.get_state(event.get_ids()[1]) != "default":
-    #         state = fsm.get_state(event.get_ids()[1])
-    #         if state == "add_category":
-    #             category_name = event.message.body.text.strip()
-    #             if 4 < len(category_name) < 50:
-    #                 # Сохраняем категорию в БД
-    #                 try:
-    #                     all_categories = get_categories_from_db()
-    #                     if category_name not in all_categories:
-    #                         fsm.append_dict(event.get_ids()[1], "category", category_name)
-    #                         fsm.set_state(event.get_ids()[1], "add_product_text")
-
-    #                         logger.info(f"Категория {category_name} добавлена в БД")
-    #                         await bot.send_message(
-    #                         chat_id=event.message.recipient.chat_id,
-    #                 text="Введите описание товара:",
-    #                 attachments=[adminskb.back1()],
-    #                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #             )
-    #                 except:
-    #                     await bot.send_message(
-    #                 chat_id=event.message.recipient.chat_id,
-    #                 text="Категория с таким названием уже существует",
-    #         attachments=[adminskb.back1()],
-    #         parse_mode=parse_mode.ParseMode.MARKDOWN
-    #     )
-    #         elif state == "add_product_text":
-    #             product_text = event.message.body.text
-    #             if 4 < len(product_text) < 500:
-    #                 fsm.append_dict(event.get_ids()[1], "product_text", product_text)
-    #                 fsm.set_state(event.get_ids()[1], "add_product_link")
-    #                 await bot.send_message(
-    #         chat_id=event.message.recipient.chat_id,
-    #         text="Введите ссылку на товар:",
-    #         attachments=[adminskb.back1()],
-    #         parse_mode=parse_mode.ParseMode.MARKDOWN
-    #     )
-    #         # ========== ОБРАБОТКА ТЕКСТОВЫХ СОСТОЯНИЙ ==========
-    #         if state == "add_product_link":
-    #             link = event.message.body.text
-    #             if len(link) > 4 and link.startswith("https"):
-    #                 fsm.append_dict(event.get_ids()[1], "product_link", link)
-    #                 fsm.set_state(event.get_ids()[1], "add_product_photo")
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Отправьте фото товара:",
-    #                     attachments=[adminskb.back1()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-    #             else:
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Ссылка должна начинаться с https и быть длиннее 4 символов",
-    #                     attachments=[adminskb.back1()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-
-    #         elif state == "add_video_category":
-    #             category_name = event.message.body.text.strip()
-    #             all_categories = get_all_video_categories()
-    #             if 4 < len(category_name) < 50 and category_name not in all_categories:
-    #                 fsm.append_dict(event.get_ids()[1], "video_category", category_name)
-    #                 fsm.set_state(event.get_ids()[1], "add_video_title")
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Введите название видео:",
-    #                     attachments=[adminskb.back2()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-    #             else:
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Название категории должно быть от 4 до 50 символов",
-    #                     attachments=[adminskb.back2()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-
-    #         elif state == "add_video_title":
-    #             title = event.message.body.text.strip()
-    #             if 4 < len(title) < 100:
-    #                 fsm.append_dict(event.get_ids()[1], "video_name", title)
-    #                 fsm.set_state(event.get_ids()[1], "add_video_description")
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Введите описание видео:",
-    #                     attachments=[adminskb.back2()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-    #             else:
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Название должно быть от 4 до 100 символов",
-    #                     attachments=[adminskb.back2()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-
-    #         elif state == "add_video_description":
-    #             description = event.message.body.text.strip()
-    #             fsm.append_dict(event.get_ids()[1], "video_text", description)
-    #             fsm.set_state(event.get_ids()[1], "add_video")
-    #             await bot.send_message(
-    #                 chat_id=event.message.recipient.chat_id,
-    #                 text="Отправьте видео, которое хотите добавить:",
-    #                 attachments=[adminskb.back2()],
-    #                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #             )
-
-    #         elif state == "enter_text_message":
-    #             description = event.message.body.text.strip()
-    #             fsm.append_dict(event.get_ids()[1], "text_message", description)
-    #             fsm.set_state(event.get_ids()[1], "add_photo_messages")
-    #             await bot.send_message(
-    #                 chat_id=event.message.recipient.chat_id,
-    #                 text="Отправьте фото, которое хотите добавить в рассылку:",
-    #                 attachments=[adminskb.to_menu()],
-    #                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #             )
-
-
-
-
-
-    #         #!!
-
-    #         elif state == "add_recipe_category":
-    #             category_name = event.message.body.text.strip()
-    #             all_categories = get_all_recipes_categories()
-    #             if 4 < len(category_name) < 50 and category_name not in all_categories:
-    #                 fsm.append_dict(event.get_ids()[1], "recipe_category", category_name)
-    #                 fsm.set_state(event.get_ids()[1], "add_recipe_title")
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Введите название рецепта:",
-    #                     attachments=[adminskb.back3()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-    #             else:
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Название категории должно быть от 4 до 50 символов",
-    #                     attachments=[adminskb.back3()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-
-    #         elif state == "add_recipe_title":
-    #             title = event.message.body.text.strip()
-    #             if 4 < len(title) < 100:
-    #                 fsm.append_dict(event.get_ids()[1], "recipe_name", title)
-    #                 fsm.set_state(event.get_ids()[1], "add_recipe_description")
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Введите описание рецепта:",
-    #                     attachments=[adminskb.back3()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-    #             else:
-    #                 await bot.send_message(
-    #                     chat_id=event.message.recipient.chat_id,
-    #                     text="Название должно быть от 4 до 100 символов",
-    #                     attachments=[adminskb.back3()],
-    #                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                 )
-
-    #         elif state == "add_recipe_description":
-    #             description = event.message.body.text.strip()
-    #             fsm.append_dict(event.get_ids()[1], "recipe_text", description)
-    #             fsm.set_state(event.get_ids()[1], "add_recipe_video")
-    #             await bot.send_message(
-    #                 chat_id=event.message.recipient.chat_id,
-    #                 text="Отправьте видео, которое хотите добавить для рецепта:",
-    #                 attachments=[adminskb.back3()],
-    #                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #             )
-    #         # ========== ОБРАБОТКА СОСТОЯНИЙ С МЕДИАФАЙЛАМИ ==========
-    #         elif event.message.body.attachments:
-
-    #             # Состояние для добавления ВИДЕО
-    #             if state == "add_video":
-    #                 for attachment in event.message.body.attachments:
-    #                     if attachment.type.lower() == "video":
-    #                         video_url = attachment.payload.url
-    #                         fsm.append_dict(event.get_ids()[1], "video", video_url)
-
-    #                         # Получаем все данные
-    #                         ddict = fsm.get_dict(event.get_ids()[1])
-
-    #                         # Проверяем наличие всех ключей
-    #                         if all(k in ddict for k in ["video_category", "video_name", "video_text", "video"]):
-    #                             create_video(
-    #                                 name=ddict["video_name"],
-    #                                 text=ddict["video_text"],
-    #                                 video_url=ddict["video"],
-    #                                 category=ddict["video_category"]
-    #                             )
-
-    #                             await bot.send_message(
-    #                                 chat_id=event.message.recipient.chat_id,
-    #                                 text="✅ Видео успешно добавлено",
-    #                                 attachments=[adminskb.to_menu()],
-    #                                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                             )
-
-    #                             # Очищаем данные
-    #                             fsm.clear_dict(event.get_ids()[1])
-    #                             fsm.set_state(event.get_ids()[1], "default")
-    #                         else:
-    #                             await bot.send_message(
-    #                                 chat_id=event.message.recipient.chat_id,
-    #                                 text="❌ Ошибка: не все данные видео заполнены",
-    #                                 attachments=[adminskb.back2()],
-    #                                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                             )
-    #                         break  # Выходим после обработки первого видео
-
-    #             # Состояние для добавления ФОТО товара
-    #             elif state == "add_product_photo":
-    #                 for attachment in event.message.body.attachments:
-    #                     if attachment.type.lower() == "image":
-    #                         photo_url = attachment.payload.url
-    #                         fsm.append_dict(event.get_ids()[1], "product_photo", photo_url)
-
-    #                         # Получаем все данные
-    #                         ddict = fsm.get_dict(event.get_ids()[1])
-
-    #                         # Проверяем наличие всех ключей
-    #                         if all(k in ddict for k in ["product_text", "product_link", "product_photo", "category"]):
-    #                             # Сохраняем товар в БД
-    #                             success = create_product(
-    #                                 name=ddict["product_text"],
-    #                                 description=ddict["product_text"],  # Если нужно отдельное описание - создайте отдельное поле
-    #                                 link=ddict["product_link"],
-    #                                 photo_url=ddict["product_photo"],
-    #                                 category=ddict["category"]
-    #                             )
-
-    #                             if success:
-    #                                 logger.info(f"Товар добавлен в категорию {ddict['category']}")
-    #                                 await bot.send_message(
-    #                                     chat_id=event.message.recipient.chat_id,
-    #                                     text="✅ Товар успешно добавлен",
-    #                                     attachments=[adminskb.to_menu()],
-    #                                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                                 )
-    #                             else:
-    #                                 await bot.send_message(
-    #                                     chat_id=event.message.recipient.chat_id,
-    #                                     text="❌ Ошибка при добавлении товара",
-    #                                     attachments=[adminskb.back1()],
-    #                                     parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                                 )
-
-    #                             # Очищаем данные в любом случае
-    #                             fsm.clear_dict(event.get_ids()[1])
-    #                             fsm.set_state(event.get_ids()[1], "default")
-    #                         else:
-    #                             await bot.send_message(
-    #                                 chat_id=event.message.recipient.chat_id,
-    #                                 text="❌ Ошибка: не все данные товара заполнены",
-    #                                 attachments=[adminskb.back1()],
-    #                                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                             )
-    #                         break  # Выходим после обработки первого фото
-    #             elif state == "add_recipe_video":
-    #                 for attachment in event.message.body.attachments:
-    #                     if attachment.type.lower() == "video":
-    #                         video_url = attachment.payload.url
-    #                         fsm.append_dict(event.get_ids()[1], "video", video_url)
-
-    #                         # Получаем все данные
-    #                         ddict = fsm.get_dict(event.get_ids()[1])
-
-    #                         # Проверяем наличие всех ключей
-    #                         if all(k in ddict for k in ["recipe_name", "recipe_text", "recipe_category", "video"]):
-    #                             create_recipe(
-    #                                 name=ddict["recipe_name"],
-    #                                 text=ddict["recipe_text"],
-    #                                 video_url=ddict["video"],
-    #                                 category=ddict["recipe_category"]
-    #                             )
-
-    #                             await bot.send_message(
-    #                                 chat_id=event.message.recipient.chat_id,
-    #                                 text="✅ Рецепт успешно добавлен",
-    #                                 attachments=[adminskb.to_menu()],
-    #                                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                             )
-
-    #                             # Очищаем данные
-    #                             fsm.clear_dict(event.get_ids()[1])
-    #                             fsm.set_state(event.get_ids()[1], "default")
-    #                         else:
-    #                             await bot.send_message(
-    #                                 chat_id=event.message.recipient.chat_id,
-    #                                 text="❌ Ошибка: не все данные видео заполнены",
-    #                                 attachments=[adminskb.back3()],
-    #                                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                             )
-    #                         break  # Выходим после обработки первого видео
-    #             elif state == "add_photo_messages":
-    #                 for attachment in event.message.body.attachments:
-    #                     if attachment.type.lower() == "image":
-    #                         photo_url = attachment.payload.url
-    #                         fsm.append_dict(event.get_ids()[1], "photo_message", photo_url)
-
-    #                         # Получаем все данные
-    #                         ddict = fsm.get_dict(event.get_ids()[1])
-
-    #                         # Проверяем наличие всех ключей
-    #                         if all(k in ddict for k in ["photo_message", "text_message"]):
-    #                             # Сохраняем товар в БД
-    #                             users = get_all_users()
-    #                             c = 0
-    #                             for user_id in users:
-    #                                 try:
-    #                                     await bot.send_message(
-    #                                 chat_id=user_id,
-    #                                 text=ddict["text_message"],
-    #                                 attachments=[ddict["photo_message"], user_menu()],
-    #                                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                             )
-    #                                     c += 1
-    #                                 except:
-    #                                     continue
-
-
-    #                             # Очищаем данные в любом случае
-    #                             fsm.clear_dict(event.get_ids()[1])
-    #                             fsm.set_state(event.get_ids()[1], "default")
-    #                             await bot.send_message(
-    #                                 chat_id=event.message.recipient.chat_id,
-    #                                 text=f"Ваше сообщение было разослано {c} пользователям.",
-    #                                 attachments=[adminskb.to_menu()],
-    #                                 parse_mode=parse_mode.ParseMode.MARKDOWN
-    #                             )
-    #                         break  # Выходим после обработки первого фото
+    @dp.message_callback(
+        F.callback.payload.startswith("edit_recipe_desc:")
+    )
+    async def edit_recipe_desc_prompt(event: MessageCallback):
+        chat_id, user_id = event.get_ids()
+        if user_id not in admins():
+            return
+        recipe_id = event.callback.payload.split(":")[1]
+        fsm.append_dict(user_id, "recipe_id", recipe_id)
+        fsm.set_state(user_id, "set_recipe_ds")
+        await bot.send_message(
+            chat_id=chat_id,
+            text="Введите новое описание рецепта (можно оставить пустым):",
+            attachments=[adminskb.back_to_recipe_menu_kb()]
+        )
