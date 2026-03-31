@@ -122,9 +122,11 @@ def register_raffles(bot: Bot, admins: list):
             )
 
             participants = get_weekly_participants()
+            user = get_user_info(winner_id)
             announcement_text = (
                 f"🤖 Результаты еженедельного розыгрыша!\n"
-                f"Победитель: пользователь с ID {winner_id}\n"
+                f"Победитель: {user['full_name']}\n"
+                f"{user['username']}"
             )
             for user_id in participants:
                 try:
@@ -160,9 +162,11 @@ def register_raffles(bot: Bot, admins: list):
             )
 
             participants = get_monthly_participants()
+            user = get_user_info(winner_id)
             announcement_text = (
                 f"🤖 Результаты ежемесячного розыгрыша!\n"
-                f"Победитель: пользователь с ID {winner_id}\n"
+                f"Победитель: {user['full_name']}\n"
+                f"{user['username']}"
             )
             for user_id in participants:
                 try:
@@ -185,3 +189,29 @@ def register_raffles(bot: Bot, admins: list):
                     pass
         except Exception as e:
             print(f"Ошибка при отправке результатов ежемесячного розыгрыша: {e}")
+
+    async def get_user_info(user_id: int) -> dict | None:
+        """
+        Возвращает информацию о пользователе: имя, юзернейм, ссылку на профиль.
+        """
+        try:
+            data = await bot.api.request(
+                method='GET',
+                path=f'/users/{user_id}',
+                is_return_raw=True
+            )
+            first_name = data.get('first_name')
+            last_name = data.get('last_name', '')
+            username = data.get('username')
+            full_name = f"{first_name} {last_name}".strip() if first_name else None
+            if username:
+                link = f"https://chat.max.ru/@{username}"
+            else:
+                link = f"https://chat.max.ru/id{user_id}"
+            return {
+                'full_name': full_name,
+                'username': username,
+                'link': link
+            }
+        except Exception as e:
+            return None
