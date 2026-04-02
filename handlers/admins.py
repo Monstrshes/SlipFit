@@ -458,7 +458,7 @@ def register_handlers(dp, bot):
 )
     async def edit_video_name_prompt(event: MessageCallback):
         chat_id, user_id = event.get_ids()
-        if user_id not in admins():
+        if user_id not in admins:
             return
         video_id = event.callback.payload.split(":")[1]
         fsm.append_dict(user_id, "video_id", video_id)
@@ -474,7 +474,7 @@ def register_handlers(dp, bot):
     )
     async def edit_video_desc_prompt(event: MessageCallback):
         chat_id, user_id = event.get_ids()
-        if user_id not in adminskb():
+        if user_id not in admins:
             return
         video_id = event.callback.payload.split(":")[1]
         fsm.append_dict(user_id, "video_id", video_id)
@@ -489,7 +489,7 @@ def register_handlers(dp, bot):
 )
     async def edit_recipe_name_prompt(event: MessageCallback):
         chat_id, user_id = event.get_ids()
-        if user_id not in admins():
+        if user_id not in admins:
             return
         recipe_id = event.callback.payload.split(":")[1]
         fsm.append_dict(user_id, "recipe_id", recipe_id)
@@ -505,7 +505,7 @@ def register_handlers(dp, bot):
     )
     async def edit_recipe_desc_prompt(event: MessageCallback):
         chat_id, user_id = event.get_ids()
-        if user_id not in admins():
+        if user_id not in admins:
             return
         recipe_id = event.callback.payload.split(":")[1]
         fsm.append_dict(user_id, "recipe_id", recipe_id)

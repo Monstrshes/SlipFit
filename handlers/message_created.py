@@ -29,6 +29,7 @@ admins = Config().admins
 def register_handlers(dp, bot):
     @dp.message_created()
     async def text_message(event: MessageCreated):
+                chat_id, user_id = event.get_ids()
                 if fsm.get_state(event.get_ids()[1]) != "default":
                     state = fsm.get_state(event.get_ids()[1])
                     if state == "input_age":
@@ -328,7 +329,7 @@ def register_handlers(dp, bot):
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
                             await bot.send_message(
-                                chat_id=event.get_ids()[1],
+                                chat_id=event.get_ids()[0],
                                 text="✅ Название видео обновлено.",
                                 attachments=[adminskb.back_to_video_menu_kb()]
                             )

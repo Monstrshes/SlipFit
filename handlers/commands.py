@@ -261,7 +261,7 @@ def register_handlers(dp, bot):
             return
 
         user_id = event.get_ids()[1]
-        is_admin = user_id in admins()   # функция из database.users
+        is_admin = user_id in admins   # функция из database.users
 
         # Формируем текст
         if len(video.get('text', '')) > 5:
@@ -349,7 +349,7 @@ def register_handlers(dp, bot):
             return
 
         user_id = event.get_ids()[1]
-        is_admin = user_id in admins()
+        is_admin = user_id in admins
 
         # Формируем текст
         if len(recipe.get('text', '')) > 5:
