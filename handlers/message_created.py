@@ -319,11 +319,11 @@ def register_handlers(dp, bot):
                             if not video_id:
                                 afsm.set_state(user_id, "default")
                                 afsm.clear_dict(user_id)
-                                await bot.send_message(chat_id=event.get_ids()[1], text="Ошибка, начните заново.")
+                                await bot.send_message(chat_id=event.get_ids()[0], text="Ошибка, начните заново.")
                                 return
                             new_name = event.message.body.text.strip()
                             if not new_name:
-                                await bot.send_message(chat_id=event.get_ids()[1], text="Название не может быть пустым.")
+                                await bot.send_message(chat_id=event.get_ids()[0], text="Название не может быть пустым.")
                                 return
                             update_video_name(video_id, new_name)   # функция обновления БД
                             afsm.set_state(user_id, "default")
@@ -341,14 +341,14 @@ def register_handlers(dp, bot):
                             if not video_id:
                                 afsm.set_state(user_id, "default")
                                 afsm.clear_dict(user_id)
-                                await bot.send_message(chat_id=event.get_ids()[1], text="Ошибка, начните заново.")
+                                await bot.send_message(chat_id=event.get_ids()[0], text="Ошибка, начните заново.")
                                 return
                             new_desc = event.message.body.text.strip() or None
                             update_video_desc(video_id, new_desc)   # функция обновления БД
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
                             await bot.send_message(
-                                chat_id=event.get_ids()[1],
+                                chat_id=event.get_ids()[0],
                                 text="✅ Описание видео обновлено.",
                                 attachments=[adminskb.back_to_video_menu_kb()]
                             )
@@ -359,17 +359,17 @@ def register_handlers(dp, bot):
                             if not recipe_id:
                                 afsm.set_state(user_id, "default")
                                 afsm.clear_dict(user_id)
-                                await bot.send_message(chat_id=event.get_ids()[1], text="Ошибка, начните заново.")
+                                await bot.send_message(chat_id=event.get_ids()[0], text="Ошибка, начните заново.")
                                 return
                             new_name = event.message.body.text.strip()
                             if not new_name:
-                                await bot.send_message(chat_id=event.get_ids()[1], text="Название не может быть пустым.")
+                                await bot.send_message(chat_id=event.get_ids()[0], text="Название не может быть пустым.")
                                 return
                             update_recipe_name(recipe_id, new_name)
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
                             await bot.send_message(
-                                chat_id=event.get_ids()[1],
+                                chat_id=event.get_ids()[0],
                                 text="✅ Название рецепта обновлено.",
                                 attachments=[adminskb.back_to_recipe_menu_kb()]
                             )
@@ -381,14 +381,14 @@ def register_handlers(dp, bot):
                             if not recipe_id:
                                 afsm.set_state(user_id, "default")
                                 afsm.clear_dict(user_id)
-                                await bot.send_message(chat_id=event.get_ids()[1], text="Ошибка, начните заново.")
+                                await bot.send_message(chat_id=event.get_ids()[0], text="Ошибка, начните заново.")
                                 return
                             new_desc = event.message.body.text.strip() or None
                             update_recipe_desc(recipe_id, new_desc)
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
                             await bot.send_message(
-                                chat_id=event.get_ids()[1],
+                                chat_id=event.get_ids()[0],
                                 text="✅ Описание рецепта обновлено.",
                                 attachments=[adminskb.back_to_recipe_menu_kb()]
                             )
