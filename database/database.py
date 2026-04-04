@@ -875,7 +875,7 @@ def update_recipe_name(recipe_id: int, new_name: str) -> bool:
     conn = sqlite3.connect('database/base.db')
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE recipes SET name = ? WHERE id = ?", (new_name, recipe_id))
+        cursor.execute("UPDATE recepts SET name = ? WHERE id = ?", (new_name, recipe_id))
         conn.commit()
         return cursor.rowcount > 0
     except sqlite3.Error as e:
@@ -887,7 +887,7 @@ def update_recipe_desc(recipe_id: int, new_desc: str | None) -> bool:
     conn = sqlite3.connect('database/base.db')
     cursor = conn.cursor()
     try:
-        cursor.execute("UPDATE recipes SET text = ? WHERE id = ?", (new_desc, recipe_id))
+        cursor.execute("UPDATE recepts SET text = ? WHERE id = ?", (new_desc, recipe_id))
         conn.commit()
         return cursor.rowcount > 0
     except sqlite3.Error as e:
