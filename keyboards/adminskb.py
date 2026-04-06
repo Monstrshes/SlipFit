@@ -114,6 +114,9 @@ def avideo():
         CallbackButton(text='Добавить видео', payload='ANewVideo')
     )
     builder.row(
+        CallbackButton(text='Добавить категорию', payload='ANewVideoCAT')
+    )
+    builder.row(
         CallbackButton(text='🔙 Назад', payload='Admin_Menu')
     )
 
@@ -186,6 +189,9 @@ def areceipt():
     )
     builder.row(
         CallbackButton(text='Добавить рецепт', payload='ANewRecipe')
+    )
+    builder.row(
+        CallbackButton(text='Добавить категорию', payload='ANewRecipeCAT')
     )
     builder.row(
         CallbackButton(text='🔙 Назад', payload='Admin_Menu')

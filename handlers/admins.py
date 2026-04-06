@@ -361,6 +361,36 @@ def register_handlers(dp, bot):
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
 
+    @dp.message_callback(F.callback.payload == 'ANewVideoCAT')
+    async def new_wideoas_categ(event: MessageCallback):
+        if event.message.sender.user_id in admins:
+            await event.answer()
+            await bot.delete_message(
+                message_id=event.message.body.mid
+            )
+        fsm.set_state(event.get_ids()[1], "add_vcategoryy")
+        await bot.send_message(
+            chat_id=event.message.recipient.chat_id,
+            text="Введите название категории",
+            attachments=[adminskb.back2()],
+            parse_mode=parse_mode.ParseMode.MARKDOWN
+        )
+
+    @dp.message_callback(F.callback.payload == 'ANewRecipeCAT')
+    async def newrecepts_cat(event: MessageCallback):
+        if event.message.sender.user_id in admins:
+            await event.answer()
+            await bot.delete_message(
+                message_id=event.message.body.mid
+            )
+        fsm.set_state(event.get_ids()[1], "add_rcategoryy")
+        await bot.send_message(
+            chat_id=event.message.recipient.chat_id,
+            text="Введите название категории",
+            attachments=[adminskb.back3()],
+            parse_mode=parse_mode.ParseMode.MARKDOWN
+        )
+
     @dp.message_callback(F.callback.payload == "ADeleteRecipeCategory")
     async def recipes(event: MessageCallback):
         await event.answer()

@@ -428,7 +428,39 @@ def register_handlers(dp, bot):
                                 attachments=[adminskb.back3()],
                                 parse_mode=parse_mode.ParseMode.MARKDOWN
                             )
+                        elif state == "add_rcategoryy":
+                            category = event.message.body.text.strip()
+                            if len(category) > 2:
+                                create_recipe(
+                                                name="",
+                                                text="",
+                                                video_url="",
+                                                category=category
+                                            )
 
+                            await bot.send_message(
+                                    chat_id=event.message.recipient.chat_id,
+                                    text="Успешно",
+                                    attachments=[adminskb.back3()],
+                                    parse_mode=parse_mode.ParseMode.MARKDOWN
+                                )
+
+                        elif state == "add_vcategoryy":
+                            category = event.message.body.text.strip()
+                            if len(category) > 2:
+                                create_video(
+                                                name="",
+                                                text="",
+                                                token="",
+                                                category=category
+                                            )
+
+                            await bot.send_message(
+                                    chat_id=event.message.recipient.chat_id,
+                                    text="Успешно",
+                                    attachments=[adminskb.back2()],
+                                    parse_mode=parse_mode.ParseMode.MARKDOWN
+                                )
                         elif state == "add_raffle_text":
                             text = event.message.body.text.strip()
                             afsm.append_dict(event.get_ids()[1], "raffle_text", text)

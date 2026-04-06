@@ -7,7 +7,8 @@ class AFSM:
                   "add_product_link", "add_video", "add_video_category", "add_video_title",
                   "add_video_description", "add_recipe_category", "add_recipe_title",
                   "add_recipe_description", "add_recipe_video", "enter_text_message",
-                  "add_photo_messages", "add_raffle_text", "add_raffle_photo", "set_video_ds", "set_video_name","set_recipe_ds", "set_recipe_name"]
+                  "add_photo_messages", "add_raffle_text", "add_raffle_photo", "set_video_ds", "set_video_name","set_recipe_ds", "set_recipe_name",
+                  "add_vcategoryy", "add_rcategoryy"]
     ddict = {}
 
     def __init__(self):
