@@ -515,3 +515,61 @@ def register_handlers(dp, bot):
             text="Введите новое описание рецепта (можно оставить пустым):",
             attachments=[adminskb.back_to_recipe_menu_kb()]
         )
+    # ===== Удаление рецепта =====
+    @dp.message_callback(
+        F.callback.payload.startswith("del_recept:")
+    )
+    async def delete_recipe_callback(event: MessageCallback):
+        chat_id, user_id = event.get_ids()
+        if user_id not in admins:
+            return
+
+        recipe_id = int(event.callback.payload.split(":")[1])
+
+        # Получаем категорию и позицию рецепта перед удалением (для обновления списка)
+        item, category = get_recipe_item_position(int(recipe_id))
+        if not category:
+            await bot.send_message(chat_id=chat_id, text="❌ Рецепт не найден.")
+            return
+
+        # Удаляем рецепт из БД
+        if delete_recipe(recipe_id):
+            # Обновляем список рецептов в категории
+            recipes = get_recipes_by_category(category)
+            if not recipes:
+                await bot.send_message(chat_id=chat_id, text="Успешно. В этой категории больше нет рецептов.")
+            else:
+                # Показываем первый рецепт в категории
+                await bot.send_message(chat_id=chat_id, text="Успешно. Чтобы вернуться к репептам, нажмите на кнопку ниже",
+                                       attachments = [adminskb.back_to_recipe_w_item(category, item - 1)])
+        else:
+            await bot.send_message(chat_id=chat_id, text="❌ Ошибка при удалении рецепта.")
+
+    @dp.message_callback(
+        F.callback.payload.startswith("del_video:")
+    )
+    async def delete_video_callback(event: MessageCallback):
+        chat_id, user_id = event.get_ids()
+        if user_id not in admins:
+            return
+
+        video_id = int(event.callback.payload.split(":")[1])
+
+        # Получаем категорию и позицию рецепта перед удалением (для обновления списка)
+        item, category = get_video_item_position(int(video_id))
+        if not category:
+            await bot.send_message(chat_id=chat_id, text="❌ Видео не найдено.")
+            return
+
+        # Удаляем рецепт из БД
+        if delete_video(video_id):
+            # Обновляем список рецептов в категории
+            videos = get_videos_by_category(category)
+            if not videos:
+                await bot.send_message(chat_id=chat_id, text="Успешно. В этой категории больше нет видео.")
+            else:
+                # Показываем первый рецепт в категории
+                await bot.send_message(chat_id=chat_id, text="Успешно. Чтобы вернуться к видео, нажмите на кнопку ниже",
+                                       attachments = [adminskb.back_to_video_w_item(category, item - 1)])
+        else:
+            await bot.send_message(chat_id=chat_id, text="❌ Ошибка при удалении рецепта.")

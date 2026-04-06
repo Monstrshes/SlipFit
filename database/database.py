@@ -894,3 +894,100 @@ def update_recipe_desc(recipe_id: int, new_desc: str | None) -> bool:
         return False
     finally:
         conn.close()
+
+
+#!!
+def get_video_item_position(video_id: int) -> tuple[int | None, str | None]:
+    """
+    Возвращает порядковый номер видео в его категории (начиная с 1) и название категории.
+    Если видео не найдено или ошибка, возвращает (None, None).
+    """
+
+    if not isinstance(video_id, int):
+        video_id = int(video_id)
+    conn = sqlite3.connect("database/base.db")
+    cursor = conn.cursor()
+    try:
+        # Получаем категорию видео
+        cursor.execute("SELECT category FROM video WHERE id = ?", (video_id,))
+        row = cursor.fetchone()
+        if not row:
+            return None, None
+        category = row[0]
+
+        # Получаем все ID видео в этой категории, отсортированные по id
+        cursor.execute("SELECT id FROM video WHERE category = ? ORDER BY id", (category,))
+        rows = cursor.fetchall()
+        video_ids = [r[0] for r in rows]
+
+        # Ищем позицию
+        if video_id in video_ids:
+            return video_ids.index(video_id) + 1, category
+        return None, None
+    except sqlite3.Error as e:
+        print(f"Ошибка получения позиции видео: {e}")
+        return None, None
+    finally:
+        conn.close()
+
+def get_recipe_item_position(recipe_id: int) -> tuple[int | None, str | None]:
+    """
+    Возвращает порядковый номер рецепта в его категории (начиная с 1) и название категории.
+    Если рецепт не найдено или ошибка, возвращает (None, None).
+    """
+    if not isinstance(recipe_id, int):
+        recipe_id = int(recipe_id)
+    conn = sqlite3.connect("database/base.db")
+    cursor = conn.cursor()
+    try:
+        # Получаем категорию рецепта
+        cursor.execute("SELECT category FROM recepts WHERE id = ?", (recipe_id,))
+        row = cursor.fetchone()
+        if not row:
+            return None, None
+        category = row[0]
+
+        # Получаем все ID рецептов в этой категории, отсортированные по id
+        cursor.execute("SELECT id FROM recepts WHERE category = ? ORDER BY id", (category,))
+        rows = cursor.fetchall()
+        recipe_ids = [r[0] for r in rows]
+
+        # Ищем позицию
+        if recipe_id in recipe_ids:
+            return recipe_ids.index(recipe_id) + 1, category
+        return None, None
+    except sqlite3.Error as e:
+        print(f"Ошибка получения позиции рецепта: {e}")
+        return None, None
+    finally:
+        conn.close()
+
+def delete_recipe(recipe_id: int) -> bool:
+    conn = sqlite3.connect("database/base.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM recepts WHERE id = ?", (recipe_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        print(f"Ошибка удаления рецепта {recipe_id}: {e}")
+        return False
+    finally:
+        conn.close()
+
+def delete_video(video_id: int) -> bool:
+    """
+    Удаляет видео из таблицы video по его ID.
+    Возвращает True, если удаление успешно, иначе False.
+    """
+    conn = sqlite3.connect("database/base.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM video WHERE id = ?", (video_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+    except sqlite3.Error as e:
+        print(f"Ошибка удаления видео {video_id}: {e}")
+        return False
+    finally:
+        conn.close()

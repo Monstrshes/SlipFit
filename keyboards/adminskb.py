@@ -25,6 +25,17 @@ def back_to_video_menu_kb():
     builder = InlineKeyboardBuilder()
     builder.row(CallbackButton(text="🔙 Назад", payload="video_cat"))
     return builder.as_markup()
+
+def back_to_video_w_item(cat, item):
+    builder = InlineKeyboardBuilder()
+    builder.row(CallbackButton(text="🔙 Назад", payload=f'vcatalog:{cat}:{item}'))
+    return builder.as_markup()
+
+def back_to_recipe_w_item(cat, item):
+    builder = InlineKeyboardBuilder()
+    builder.row(CallbackButton(text="🔙 Назад", payload=f'rcatalog:{cat}:{item}'))
+    return builder.as_markup()
+
 def acatalog():
     builder = InlineKeyboardBuilder()
 

@@ -328,10 +328,11 @@ def register_handlers(dp, bot):
                             update_video_name(video_id, new_name)   # функция обновления БД
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
+                            item, cat = get_video_item_position(video_id)
                             await bot.send_message(
                                 chat_id=event.get_ids()[0],
                                 text="✅ Название видео обновлено.",
-                                attachments=[adminskb.back_to_video_menu_kb()]
+                                attachments=[adminskb.back_to_video_w_item(cat, item)]
                             )
                             return
 
@@ -347,10 +348,11 @@ def register_handlers(dp, bot):
                             update_video_desc(video_id, new_desc)   # функция обновления БД
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
+                            item, cat = get_video_item_position(video_id)
                             await bot.send_message(
                                 chat_id=event.get_ids()[0],
                                 text="✅ Описание видео обновлено.",
-                                attachments=[adminskb.back_to_video_menu_kb()]
+                                attachments=[adminskb.back_to_video_w_item(cat, item)]
                             )
                             return
                         if state == "set_recipe_name":
@@ -368,10 +370,12 @@ def register_handlers(dp, bot):
                             update_recipe_name(recipe_id, new_name)
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
+                            item, cat = get_recipe_item_position(recipe_id)
+                            print(item, cat, recipe_id)
                             await bot.send_message(
                                 chat_id=event.get_ids()[0],
                                 text="✅ Название рецепта обновлено.",
-                                attachments=[adminskb.back_to_recipe_menu_kb()]
+                                attachments=[adminskb.back_to_recipe_w_item(cat, item)]
                             )
                             return
 
@@ -387,10 +391,11 @@ def register_handlers(dp, bot):
                             update_recipe_desc(recipe_id, new_desc)
                             afsm.set_state(user_id, "default")
                             afsm.clear_dict(user_id)
+                            item, cat = get_recipe_item_position(recipe_id)
                             await bot.send_message(
                                 chat_id=event.get_ids()[0],
                                 text="✅ Описание рецепта обновлено.",
-                                attachments=[adminskb.back_to_recipe_menu_kb()]
+                                attachments=[adminskb.back_to_recipe_w_item(cat, item)]
                             )
                             return
 
