@@ -69,7 +69,7 @@ def catalog(cat, len_catalog, wburl, item=1):
 
     return builder.as_markup()
 
-def video_cat():
+def video_cat(is_admin = 0):
     all_cats = get_all_video_categories()
     builder = InlineKeyboardBuilder()
     for cat in range(len(all_cats)):
@@ -80,6 +80,11 @@ def video_cat():
         except Exception:
             builder.row(
                 CallbackButton(text=f'{all_cats[cat]}', payload=f'vcatalog:{cat}:1'))
+    if is_admin:
+        builder.row(
+                CallbackButton(text='Добавить категорию', payload='ANewVideoCAT'))
+        builder.row(
+                CallbackButton(text='Удалить категорию', payload='ADeleteVideoCategory'))
 
     builder.row(
         CallbackButton(text='🔙 Назад', payload='start')
@@ -95,9 +100,7 @@ def viseo_catalog(cat, len_catalog, item=1, isadmin=0, video_id=0):
         CallbackButton(text=f'{item}|{len_catalog}', payload = "wsjdklasj;"),
         CallbackButton(text='▶️', payload=f'vcatalog:{cat}:{item+1}'))
 
-    builder.row(
-        CallbackButton(text='🔙 Назад', payload='video_cat')
-        )
+
     if isadmin:
         builder.row(
                 CallbackButton(text="✏️ Название", payload=f"edit_video_name:{video_id}"),
@@ -106,9 +109,13 @@ def viseo_catalog(cat, len_catalog, item=1, isadmin=0, video_id=0):
         builder.row(CallbackButton(text="Удалить видео", payload=f"del_video:{video_id}"),
                 CallbackButton(text="Добавить видео", payload=f"AChoiceVideoCat:{cat}"))
 
+    builder.row(
+        CallbackButton(text='🔙 Назад', payload='video_cat')
+        )
+
     return builder.as_markup()
 
-def recipe_cat():
+def recipe_cat(is_admin):
     all_cats = get_all_recipes_categories()
     builder = InlineKeyboardBuilder()
     for cat in range(len(all_cats)):
@@ -118,6 +125,13 @@ def recipe_cat():
 
     builder.row(
         CallbackButton(text='Калькулятор калорий', payload='pick_gender'))
+
+    if is_admin:
+        builder.row(
+                CallbackButton(text='Добавить категорию', payload='ANewRecipeCAT'))
+        builder.row(
+                CallbackButton(text='Удалить категорию', payload='ADeleteRecipeCategory'))
+
     builder.row(
         CallbackButton(text='🔙 Назад', payload='start')
         )
@@ -262,5 +276,19 @@ def instrucntion_srid(platform):
         )
     builder.row(
         CallbackButton(text='🔙 Назад', payload=f'join_raffle')
+        )
+    return builder.as_markup()
+
+def back_to_recipes_cat():
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        CallbackButton(text='🔙 Назад', payload='recipe_cat')
+        )
+    return builder.as_markup()
+
+def back_to_videos_cat():
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        CallbackButton(text='🔙 Назад', payload='video_cat')
         )
     return builder.as_markup()

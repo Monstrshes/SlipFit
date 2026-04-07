@@ -232,11 +232,13 @@ def register_handlers(dp, bot):
             return
 
         image = InputMedia("static/img/vide_cat.jpg")
+        user_id = event.get_ids()[1]
+        is_admin = user_id in admins
 
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
             text=messagess["video_cat"],
-            attachments = [image, users.video_cat()],
+            attachments = [image, users.video_cat(is_admin)],
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
 
@@ -258,6 +260,11 @@ def register_handlers(dp, bot):
 
         video = get_video_in_category(category, item_id)
         if not video:
+            await bot.send_message(
+                chat_id = event.get_ids()[0],
+                text="В это категории пока что ничего нет(. Возвращайтесь сюда позже.",
+                attachments = [users.back_to_videos_cat()]
+            )
             return
 
         user_id = event.get_ids()[1]
@@ -309,10 +316,13 @@ def register_handlers(dp, bot):
         fsm.set_state(event.get_ids()[1], "default")
         image = InputMedia("static/img/recipes_cat.jpg")
 
+        user_id = event.get_ids()[1]
+        is_admin = user_id in admins
+
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
             text=messagess["recipes_cat"],
-            attachments = [image, users.recipe_cat()],
+            attachments = [image, users.recipe_cat(is_admin)],
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
 
@@ -346,6 +356,11 @@ def register_handlers(dp, bot):
 
         recipe = get_recipe_in_category(category, item_id)
         if not recipe:
+            await bot.send_message(
+                chat_id = event.get_ids()[0],
+                text="В это категории пока что ничего нет(. Возвращайтесь сюда позже.",
+                attachments = [users.back_to_recipes_cat()]
+            )
             return
 
         user_id = event.get_ids()[1]
