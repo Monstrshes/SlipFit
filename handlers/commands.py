@@ -256,14 +256,32 @@ def register_handlers(dp, bot):
         elif item_id < 1:
             item_id = total_items
 
+        if len(videos) == 2:
+            empty_video = None
+            for v in videos:
+                if not v.get('name') or v['name'].strip() == '':
+                    empty_video = v
+                    break
+            if empty_video:
+                delete_video(empty_video['id'])   # предполагается, что такая функция существует
+                # Обновляем список видео после удаления
+                videos = get_videos_by_category(category)
+                total_items = len(videos)
+                # Корректируем item_id, если удалённое видео было текущим
+                if item_id > total_items:
+                    item_id = total_items
+                if item_id < 1:
+                    item_id = 1
+
         await bot.delete_message(message_id=event.message.body.mid)
 
         video = get_video_in_category(category, item_id)
-        if not video:
+        if not video or len(video['name']) < 3:
+            is_admin = event.get_ids()[1]  in admins
             await bot.send_message(
                 chat_id = event.get_ids()[0],
                 text="В это категории пока что ничего нет(. Возвращайтесь сюда позже.",
-                attachments = [users.back_to_videos_cat()]
+                attachments = [users.back_to_videos_cat(is_admin, category)]
             )
             return
 
@@ -352,16 +370,36 @@ def register_handlers(dp, bot):
         elif item_id < 1:
             item_id = total_items
 
+        if len(recipes) == 2:
+            empty_recipe = None
+            for r in recipes:
+                if not r.get('name') or r['name'].strip() == '':
+                    empty_recipe = r
+                    break
+            if empty_recipe:
+                delete_recipe(empty_recipe['id'])
+                # Обновляем список рецептов после удаления
+                recipes = get_recipes_by_category(category)
+                total_items = len(recipes)
+                # Корректируем item_id, если удалённый рецепт был текущим
+                if item_id > total_items:
+                    item_id = total_items
+                if item_id < 1:
+                    item_id = 1
+
         await bot.delete_message(message_id=event.message.body.mid)
 
         recipe = get_recipe_in_category(category, item_id)
-        if not recipe:
+        if not recipe or len(recipe["name"]) < 3:
+            is_admin = event.get_ids()[1]  in admins
             await bot.send_message(
-                chat_id = event.get_ids()[0],
-                text="В это категории пока что ничего нет(. Возвращайтесь сюда позже.",
-                attachments = [users.back_to_recipes_cat()]
-            )
+                    chat_id = event.get_ids()[0],
+                    text="В это категории пока что ничего нет(. Возвращайтесь сюда позже.",
+                    attachments = [users.back_to_recipes_cat(is_admin, category)]
+                )
             return
+
+
 
         user_id = event.get_ids()[1]
         is_admin = user_id in admins
@@ -544,138 +582,3 @@ def register_handlers(dp, bot):
                         text=messagess["instruction_strid_ozon"],
                         attachments=[instr1, instr2, instr3, instr4, instr5, instr6, users.back4(platform)],
                         parse_mode=parse_mode.ParseMode.MARKDOWN)
-
-
-
-
-
-
-
-    # @dp.message_created()
-    # async def message_from_admin(event: MessageCreated):
-    #     if fsm.get_state(event.get_ids()[1]) != "default":
-    #         state = fsm.get_state(event.get_ids()[1])
-    #         if state == "input_age":
-    #             try:
-    #                 age = int(event.message.body.text)
-    #                 if 5 <= age <= 100:
-    #                     await bot.delete_message(message_id=event.message.body.mid)
-    #                     await bot.send_message(
-    #                             chat_id=event.message.recipient.chat_id,
-    #                             text="Введите Ваш рост в см:",
-    #                             attachments = [users.back_to_r()]
-    #                         )
-    #                     fsm.append_dict(event.get_ids()[1], "age", age)
-    #                     fsm.set_state(event.get_ids()[1], "input_height")
-    #                 else:
-    #                     await bot.delete_message(message_id=event.message.body.mid)
-    #                     fsm.clear_dict(event.get_ids()[1])
-    #                     fsm.set_state(event.get_ids()[1], "default")
-    #                     await bot.send_message(
-    #                             chat_id=event.message.recipient.chat_id,
-    #                             text="Неккоректный возраст\n\nВозраст должен быть в пределах [5; 100]",
-    #                             attachments = [users.back_to_r()]
-    #                         )
-    #             except Exception as e:
-    #                 await bot.delete_message(message_id=event.message.body.mid)
-    #                 fsm.clear_dict(event.get_ids()[1])
-    #                 fsm.set_state(event.get_ids()[1], "default")
-    #                 await bot.send_message(
-    #                         chat_id=event.message.recipient.chat_id,
-    #                         text="Возраст должен быть целым числом!!!",
-    #                         attachments = [users.back_to_r()]
-    #                     )
-    #         elif state == "input_weight":
-    #             try:
-    #                 weight = int(event.message.body.text)
-    #                 if 30 <= weight <= 300:
-    #                     await bot.delete_message(message_id=event.message.body.mid)
-    #                     fsm.append_dict(event.get_ids()[1], "weight", weight)
-    #                     await bot.send_message(
-    #                             chat_id=event.message.recipient.chat_id,
-    #                             text=messagess["daily_activity"],
-    #                             attachments = [users.pick_daily_act()]
-    #                         )
-    #                 else:
-    #                     await bot.delete_message(message_id=event.message.body.mid)
-    #                     fsm.clear_dict(event.get_ids()[1])
-    #                     fsm.set_state(event.get_ids()[1], "default")
-    #                     await bot.send_message(
-    #                             chat_id=event.message.recipient.chat_id,
-    #                             text="Неккоректный вес\n\nВес должен быть в пределах [30; 300]",
-    #                             attachments = [users.back_to_r()]
-    #                         )
-    #             except:
-    #                 await bot.delete_message(message_id=event.message.body.mid)
-    #                 fsm.clear_dict(event.get_ids()[1])
-    #                 fsm.set_state(event.get_ids()[1], "default")
-    #                 await bot.send_message(
-    #                         chat_id=event.message.recipient.chat_id,
-    #                         text="Вес должен быть числом!!!",
-    #                         attachments = [users.pick_gender()]
-    #                     )
-
-
-    #         elif state == "input_srid":
-    #             try:
-    #                 srid = (event.message.body.text)
-    #                 if len(srid) > 10:
-    #                     strid = event.message.body.text
-    #                     current_date = datetime.now().date()
-    #                     add_user_to_monthly_raffle(event.get_ids()[1], current_date, strid)
-    #                     await bot.send_message(
-    #                         chat_id=event.message.recipient.chat_id,
-    #                         text="Вы успешно зарегестрировались в розыгрыше! Мы оповестим Вас о результате!",
-    #                         attachments = [users.to_menu()]
-    #                     )
-    #                     fsm.set_state(event.get_ids()[1], "default")
-    #                 else:
-    #                     await bot.delete_message(message_id=event.message.body.mid)
-    #                     fsm.clear_dict(event.get_ids()[1])
-    #                     fsm.set_state(event.get_ids()[1], "default")
-    #                     await bot.send_message(
-    #                             chat_id=event.message.recipient.chat_id,
-    #                             text="Некорректный srid",
-    #                             attachments = [users.back4()]
-    #                         )
-    #             except:
-    #                 await bot.delete_message(message_id=event.message.body.mid)
-    #                 fsm.clear_dict(event.get_ids()[1])
-    #                 fsm.set_state(event.get_ids()[1], "default")
-    #                 await bot.send_message(
-    #                         chat_id=event.message.recipient.chat_id,
-    #                         text="Вес должен быть числом!!!",
-    #                         attachments = [users.pick_gender()]
-    #                     )
-
-    #         elif state == "input_height":
-    #             try:
-    #                 height = int(event.message.body.text)
-    #                 if 130 <= height <= 210:
-    #                     await bot.delete_message(message_id=event.message.body.mid)
-    #                     fsm.append_dict(event.get_ids()[1], "height", height)
-    #                     fsm.set_state(event.get_ids()[1], "input_weight")
-    #                     await bot.send_message(
-    #                             chat_id=event.message.recipient.chat_id,
-    #                             text="Введите Ваш вес:",
-    #                             attachments = [users.back_to_r()]
-    #                         )
-    #                 else:
-    #                     await bot.delete_message(message_id=event.message.body.mid)
-    #                     fsm.clear_dict(event.get_ids()[1])
-    #                     fsm.set_state(event.get_ids()[1], "default")
-    #                     await bot.send_message(
-    #                             chat_id=event.message.recipient.chat_id,
-    #                             text="Неккоректный рост\n\nРост должен быть в пределах [130; 210]",
-    #                             attachments = [users.back_to_r()]
-    #                         )
-    #             except Exception as e:
-    #                 print(e)
-    #                 await bot.delete_message(message_id=event.message.body.mid)
-    #                 fsm.clear_dict(event.get_ids()[1])
-    #                 fsm.set_state(event.get_ids()[1], "default")
-    #                 await bot.send_message(
-    #                         chat_id=event.message.recipient.chat_id,
-    #                         text="Рост должен быть числом!!!",
-    #                         attachments = [users.pick_gender()]
-    #                     )

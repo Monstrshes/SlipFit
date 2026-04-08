@@ -107,7 +107,7 @@ def viseo_catalog(cat, len_catalog, item=1, isadmin=0, video_id=0):
                 CallbackButton(text="📝 Описание", payload=f"edit_video_desc:{video_id}")
             )
         builder.row(CallbackButton(text="Удалить видео", payload=f"del_video:{video_id}"),
-                CallbackButton(text="Добавить видео", payload=f"AChoiceVideoCat:{cat}"))
+                CallbackButton(text="Добавить видео", payload=f"AChoiceVideoCat:{cat}:11"))
 
     builder.row(
         CallbackButton(text='🔙 Назад', payload='video_cat')
@@ -160,7 +160,7 @@ def recipe_catalog(cat, len_catalog, item=1, isadmin=0, recipe_id=0):
                 CallbackButton(text="✏️ Название", payload=f"edit_recipe_name:{recipe_id}"),
                 CallbackButton(text="📝 Описание", payload=f"edit_recipe_desc:{recipe_id}"))
         builder.row(CallbackButton(text="Удалить рецепт", payload=f"del_recept:{recipe_id}"),
-                CallbackButton(text="Добавить рецепт", payload=f"AChoiceRecipeCat:{cat}")
+                CallbackButton(text="Добавить рецепт", payload=f"AChoiceRecipeCat:{cat}:11")
             )
     builder.row(
         CallbackButton(text='🔙 Назад', payload='recipe_cat')
@@ -279,15 +279,23 @@ def instrucntion_srid(platform):
         )
     return builder.as_markup()
 
-def back_to_recipes_cat():
+def back_to_recipes_cat(is_admin=0, cat=""):
     builder = InlineKeyboardBuilder()
+    if is_admin:
+        builder.row(
+        CallbackButton(text='Добавить рецепт', payload=f'AChoiceRecipeCat:{cat}')
+        )
     builder.row(
         CallbackButton(text='🔙 Назад', payload='recipe_cat')
         )
     return builder.as_markup()
 
-def back_to_videos_cat():
+def back_to_videos_cat(is_admin=0, cat=""):
     builder = InlineKeyboardBuilder()
+    if is_admin:
+        builder.row(
+        CallbackButton(text='Добавить видео', payload=f'AChoiceVideoCat:{cat}')
+        )
     builder.row(
         CallbackButton(text='🔙 Назад', payload='video_cat')
         )

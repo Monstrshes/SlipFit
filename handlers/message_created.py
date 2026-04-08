@@ -441,7 +441,7 @@ def register_handlers(dp, bot):
                             await bot.send_message(
                                     chat_id=event.message.recipient.chat_id,
                                     text="Успешно",
-                                    attachments=[adminskb.back3()],
+                                    attachments=[users.back_to_recipes_cat()],
                                     parse_mode=parse_mode.ParseMode.MARKDOWN
                                 )
 
@@ -458,7 +458,7 @@ def register_handlers(dp, bot):
                             await bot.send_message(
                                     chat_id=event.message.recipient.chat_id,
                                     text="Успешно",
-                                    attachments=[adminskb.back2()],
+                                    attachments=[users.back_to_videos_cat()],
                                     parse_mode=parse_mode.ParseMode.MARKDOWN
                                 )
                         elif state == "add_raffle_text":
@@ -482,6 +482,7 @@ def register_handlers(dp, bot):
                                         token = attachment.payload.token
                                         # path = await save_video_to_disk(video_url)
                                         # afsm.append_dict(event.get_ids()[1], "video", path )
+
                                         afsm.append_dict(event.get_ids()[1], "token", token )
                                         # Получаем все данные
                                         ddict = afsm.get_dict(event.get_ids()[1])
@@ -494,17 +495,24 @@ def register_handlers(dp, bot):
                                                 token=ddict["token"],
                                                 category=ddict["video_category"]
                                             )
+                                            if not ddict["videos"]:
+                                                await bot.send_message(
+                                                    chat_id=event.message.recipient.chat_id,
+                                                    text="✅ Видео успешно добавлено",
+                                                    attachments=[adminskb.to_menu()],
+                                                    parse_mode=parse_mode.ParseMode.MARKDOWN
+                                                )
+                                            else:
+                                                await bot.send_message(
+                                                    chat_id=event.message.recipient.chat_id,
+                                                    text="✅ Видео успешно добавлено",
+                                                    attachments=[adminskb.to_menu(path="video_cat")],
+                                                    parse_mode=parse_mode.ParseMode.MARKDOWN
+                                                )
 
-                                            await bot.send_message(
-                                                chat_id=event.message.recipient.chat_id,
-                                                text="✅ Видео успешно добавлено",
-                                                attachments=[adminskb.to_menu()],
-                                                parse_mode=parse_mode.ParseMode.MARKDOWN
-                                            )
-
-                                            # Очищаем данные
-                                            afsm.clear_dict(event.get_ids()[1])
-                                            afsm.set_state(event.get_ids()[1], "default")
+                                                # Очищаем данные
+                                                afsm.clear_dict(event.get_ids()[1])
+                                                afsm.set_state(event.get_ids()[1], "default")
                                         else:
                                             await bot.send_message(
                                                 chat_id=event.message.recipient.chat_id,
@@ -579,13 +587,20 @@ def register_handlers(dp, bot):
                                                 video_url=ddict["video_url"],
                                                 category=ddict["recipe_category"]
                                             )
-
-                                            await bot.send_message(
-                                                chat_id=event.message.recipient.chat_id,
-                                                text="✅ Рецепт успешно добавлен",
-                                                attachments=[adminskb.to_menu()],
-                                                parse_mode=parse_mode.ParseMode.MARKDOWN
-                                            )
+                                            if not ddict["recipes"]:
+                                                await bot.send_message(
+                                                    chat_id=event.message.recipient.chat_id,
+                                                    text="✅ Рецепт успешно добавлен",
+                                                    attachments=[adminskb.to_menu()],
+                                                    parse_mode=parse_mode.ParseMode.MARKDOWN
+                                                )
+                                            else:
+                                                await bot.send_message(
+                                                    chat_id=event.message.recipient.chat_id,
+                                                    text="✅ Рецепт успешно добавлен",
+                                                    attachments=[adminskb.to_menu(path="recipe_cat")],
+                                                    parse_mode=parse_mode.ParseMode.MARKDOWN
+                                                )
 
                                             # Очищаем данные
                                             afsm.clear_dict(event.get_ids()[1])

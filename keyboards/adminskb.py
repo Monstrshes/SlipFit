@@ -82,11 +82,17 @@ def choice_catalog(lst: list):
 
     return builder.as_markup()
 
-def to_menu():
+def to_menu(path=""):
     builder = InlineKeyboardBuilder()
-
-    builder.row(
-        CallbackButton(text="В меню", payload="Admin_Menu"))
+    if not path:
+        builder.row(
+            CallbackButton(text="В меню", payload="Admin_Menu"))
+    elif path == "recipe_cat":
+        builder.row(
+            CallbackButton(text="Назад", payload="recipe_cat"))
+    elif path == "video_cat":
+        builder.row(
+            CallbackButton(text="Назад", payload="video_cat"))
 
     return builder.as_markup()
 

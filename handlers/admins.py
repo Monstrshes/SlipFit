@@ -290,7 +290,7 @@ def register_handlers(dp, bot):
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
             text="Успешно",
-            attachments=[adminskb.to_menu()],
+            attachments=[adminskb.to_menu(path="video_cat")],
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
     @dp.message_callback(F.callback.payload.startswith("AChoiceVideoCat"))
@@ -298,6 +298,8 @@ def register_handlers(dp, bot):
         await event.answer()
         await bot.delete_message(message_id=event.message.body.mid)
         category = event.callback.payload.split(":")[1]
+        if len(event.callback.payload.split(":")) > 2:
+            fsm.append_dict(event.get_ids()[1], "videos", 1)
         fsm.set_state(event.get_ids()[1], "add_video_title")
         fsm.append_dict(event.get_ids()[1], "video_category", category)
         await bot.send_message(
@@ -369,6 +371,7 @@ def register_handlers(dp, bot):
                 message_id=event.message.body.mid
             )
         fsm.set_state(event.get_ids()[1], "add_vcategoryy")
+        fsm.append_dict(event.get_ids()[1], "videos", 1)
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
             text="Введите название категории",
@@ -411,7 +414,7 @@ def register_handlers(dp, bot):
         await bot.send_message(
             chat_id=event.message.recipient.chat_id,
             text="Успешно",
-            attachments=[adminskb.to_menu()],
+            attachments=[adminskb.to_menu(path="recipe_cat")],
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
     @dp.message_callback(F.callback.payload.startswith("AChoiceRecipeCat"))
@@ -419,6 +422,8 @@ def register_handlers(dp, bot):
         await event.answer()
         await bot.delete_message(message_id=event.message.body.mid)
         category = event.callback.payload.split(":")[1]
+        if len(event.callback.payload.split(":")) > 2:
+            fsm.append_dict(event.get_ids()[1], "recipes", 1)
         fsm.set_state(event.get_ids()[1], "add_recipe_title")
         fsm.append_dict(event.get_ids()[1], "recipe_category", category)
         await bot.send_message(
@@ -449,7 +454,6 @@ def register_handlers(dp, bot):
             attachments=[adminskb.back3()],
             parse_mode=parse_mode.ParseMode.MARKDOWN
         )
-
     @dp.message_callback(F.callback.payload=="Areceips")
     async def new_recipe_categories(event: MessageCallback):
         await event.answer()
